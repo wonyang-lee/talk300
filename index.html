@@ -45,7 +45,8 @@ body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-button { font: inherit; color: inherit; cursor: pointer; }
+html { -webkit-text-size-adjust: 100%; }
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
 
@@ -136,12 +137,46 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .reset { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
 .note { margin: 0; color: var(--muted); font-size: 13px; }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
+  body { padding-block: 16px 24px; }
+  .wrap { gap: 14px; }
+  .brand h1 { font-size: 28px; }
+  .meter { flex-basis: 100%; max-width: none; }
+  .bar-row { flex-direction: column; align-items: stretch; }
+  .tabs { width: 100%; }
+  .tab { flex: 1; padding: 8px 4px; text-align: center; min-height: 44px; }
+  .pill-toggle { align-self: flex-end; }
+  /* category chips scroll edge to edge */
+  .chips {
+    margin-left: calc(max(16px, env(safe-area-inset-left, 0px)) * -1);
+    margin-right: calc(max(16px, env(safe-area-inset-right, 0px)) * -1);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .deck-meta { flex-direction: column; align-items: stretch; gap: 10px; }
+  .dir { width: 100%; }
+  .dir button { flex: 1; min-height: 40px; }
+  .card { padding: 20px 16px; border-radius: 18px; }
   .phrase { font-size: 26px; }
   .ko-big { font-size: 22px; }
-  .card { padding: 20px 16px; }
-  .brand h1 { font-size: 28px; }
-  .tab { padding: 8px 12px; }
+  .bubble { padding: 16px; }
+  .btn { min-height: 52px; }
+  /* main action buttons stay within thumb reach */
+  .dock { position: sticky; bottom: env(safe-area-inset-bottom, 0px); z-index: 5; background: var(--bg); padding: 10px 0 8px; box-shadow: 0 -1px 0 var(--line); }
+  .row.dock .btn { flex: 1 1 100%; }
+  .opt { min-height: 56px; padding: 14px; }
+  .seg button { flex: 1 1 auto; }
+  .item { padding: 10px 12px; gap: 10px; }
+  .check { width: 36px; height: 36px; }
+  .score { font-size: 48px; }
+  .center-card h2 { font-size: 22px; }
+}
+@media (hover: none) { .btn kbd { display: none; } }
+@media (max-width: 360px) {
+  .brand h1 { font-size: 25px; }
+  .phrase { font-size: 23px; }
+  .ko-big { font-size: 20px; }
+  .tab { font-size: 15px; }
 }
 @media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
 </style>
@@ -593,7 +628,7 @@ I'd like to exchange some money.|환전하고 싶어요.|` }
       (state.revealed ? '<div class="bubble">' + back + '</div>' : '<button class="btn reveal" data-act="reveal">정답 보기</button>') +
       '</article>';
     if (state.revealed) {
-      html += '<div class="grade"><button class="btn again" data-act="again">다시 볼래요<kbd>1</kbd></button><button class="btn primary" data-act="got">외웠어요<kbd>2</kbd></button></div>';
+      html += '<div class="grade dock"><button class="btn again" data-act="again">다시 볼래요<kbd>1</kbd></button><button class="btn primary" data-act="got">외웠어요<kbd>2</kbd></button></div>';
     }
     if (!canSpeak) html += '<p class="note">이 환경에서는 음성 재생을 지원하지 않아요. 소리 없이 학습할 수 있어요.</p>';
     view.innerHTML = html;
@@ -650,7 +685,7 @@ I'd like to exchange some money.|환전하고 싶어요.|` }
       '<article class="card">' + prompt + '</article><div class="opts">' + opts + '</div>';
     if (q.picked !== null) {
       html2 += '<div class="feedback"><p>' + (q.picked === q.id ? '정답이에요. ' : '아쉬워요. ') + '<b>' + esc(it.en) + '</b> ' + esc(it.ko) + '</p>' + speakBtn(it.id) + '</div>' +
-        '<div class="row"><button class="btn primary" data-act="next">' + (z.i < n2 - 1 ? '다음 문제' : '결과 보기') + '</button></div>';
+        '<div class="row dock"><button class="btn primary" data-act="next">' + (z.i < n2 - 1 ? '다음 문제' : '결과 보기') + '</button></div>';
     }
     view.innerHTML = html2;
   }
