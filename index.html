@@ -1,0 +1,762 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Daily Talk 300</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: one centered column. Header with progress, mode tabs, category chips, then a single study surface.
+   The English phrase sits in a speech-bubble block; that is the one bold move, everything else stays quiet. */
+:root {
+  --bg: #EDF2F4;
+  --surface: #FFFFFF;
+  --fg: #11212B;
+  --muted: #566874;
+  --line: #D3DDE3;
+  --accent: #0F766E;
+  --accent-ink: #FFFFFF;
+  --warn: #B45309;
+  --warn-bg: #FDF1E3;
+  --good: #15803D;
+  --good-bg: #E3F5E9;
+  --bad: #B42318;
+  --bad-bg: #FCE9E7;
+  --font-display: 'Bricolage Grotesque', 'Noto Sans KR', system-ui, sans-serif;
+  --font-body: 'Noto Sans KR', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C161D; --surface: #14222C; --fg: #E6EEF3; --muted: #92A5B2; --line: #243644;
+    --accent: #3CC2AE; --accent-ink: #04231E; --warn: #F0A44B; --warn-bg: #2B2112;
+    --good: #4ADE80; --good-bg: #12301E; --bad: #F87171; --bad-bg: #351A1A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C161D; --surface: #14222C; --fg: #E6EEF3; --muted: #92A5B2; --line: #243644;
+  --accent: #3CC2AE; --accent-ink: #04231E; --warn: #F0A44B; --warn-bg: #2B2112;
+  --good: #4ADE80; --good-bg: #12301E; --bad: #F87171; --bad-bg: #351A1A;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; }
+.brand h1 { font-family: var(--font-display); font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; margin: 0; }
+.brand h1 span { color: var(--accent); }
+.brand p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.meter { flex: 1 1 200px; max-width: 280px; }
+.meter-num { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: var(--muted); }
+.meter-num b { font-family: var(--font-display); font-size: 26px; color: var(--fg); font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s ease; }
+
+.bar-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.tab { border: 0; background: transparent; padding: 8px 18px; border-radius: 10px; font-weight: 500; min-height: 40px; }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.pill-toggle { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 8px 14px; font-size: 14px; min-height: 40px; }
+.pill-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.chip { flex: 0 0 auto; white-space: nowrap; border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 6px 14px; font-size: 14px; min-height: 36px; }
+.chip small { color: var(--muted); margin-left: 6px; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip[aria-pressed="true"] small { color: inherit; opacity: .75; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 26px 24px; display: flex; flex-direction: column; gap: 18px; }
+.label { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.phrase { margin: 4px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; overflow-wrap: anywhere; }
+.ko-big { margin: 4px 0 0; font-size: 26px; font-weight: 700; line-height: 1.35; text-wrap: balance; overflow-wrap: anywhere; }
+.front { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.front > div { min-width: 0; }
+.bubble { position: relative; background: var(--accent); color: var(--accent-ink); border-radius: 20px 20px 20px 4px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.bubble > div { min-width: 0; }
+.bubble .label { color: inherit; opacity: .8; }
+.tip { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid currentColor; border-top-color: color-mix(in srgb, currentColor 30%, transparent); font-size: 14px; }
+.deck-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+.dir { display: flex; gap: 4px; }
+.dir button { border: 1px solid var(--line); background: var(--surface); padding: 6px 12px; border-radius: 99px; font-size: 13px; min-height: 34px; }
+.dir button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 12px 18px; border-radius: 12px; font-weight: 500; min-height: 46px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.btn.again { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+.btn.reveal { align-self: stretch; border-style: dashed; color: var(--muted); }
+.btn kbd { font-family: inherit; font-size: 11px; border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; margin-left: 6px; opacity: .7; }
+.grade { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.icon-btn { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); display: inline-flex; align-items: center; justify-content: center; }
+.bubble .icon-btn { background: transparent; border-color: currentColor; color: inherit; }
+.icon-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.center-card { text-align: left; }
+.center-card h2 { font-family: var(--font-display); font-size: 26px; margin: 0; letter-spacing: -0.01em; }
+.center-card p { margin: 0; color: var(--muted); }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg button { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 14px; min-height: 44px; text-align: left; }
+.seg button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.seg button:disabled { opacity: .45; cursor: not-allowed; }
+
+.qhead { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.opts { display: grid; gap: 10px; }
+.opt { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 14px 16px; min-height: 52px; overflow-wrap: anywhere; }
+.opt:disabled { cursor: default; }
+.opt.ok { border-color: var(--good); background: var(--good-bg); color: var(--good); font-weight: 700; }
+.opt.bad { border-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+.feedback { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.feedback p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.feedback b { font-family: var(--font-display); }
+.wrong-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.wrong-list li { padding: 10px 14px; border-radius: 12px; background: var(--bad-bg); }
+.wrong-list b { display: block; font-family: var(--font-display); }
+.score { font-family: var(--font-display); font-size: 56px; line-height: 1; margin: 0; }
+.score small { font-size: 22px; color: var(--muted); }
+
+.tools { display: grid; gap: 10px; }
+.tools input { width: 100%; min-height: 46px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; }
+.list-count { color: var(--muted); font-size: 14px; margin: 0; }
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.item .txt { flex: 1; min-width: 0; }
+.item .en { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 18px; line-height: 1.3; overflow-wrap: anywhere; }
+.item .ko { margin: 0; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.item.is-known .en { color: var(--muted); }
+.check { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px; border: 2px solid var(--line); background: transparent; display: inline-flex; align-items: center; justify-content: center; color: transparent; }
+.check svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.check[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.reset { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+.note { margin: 0; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 480px) {
+  .phrase { font-size: 26px; }
+  .ko-big { font-size: 22px; }
+  .card { padding: 20px 16px; }
+  .brand h1 { font-size: 28px; }
+  .tab { padding: 8px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Daily Talk <span>300</span></h1>
+      <p>미국인이 매일 쓰는 회화 표현 300개 트레이닝</p>
+    </div>
+    <div class="meter" aria-live="polite">
+      <div class="meter-num"><span>외운 표현</span><span><b id="knownCount">0</b> / 300</span></div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+  </header>
+
+  <div class="bar-row">
+    <nav class="tabs" role="tablist" aria-label="학습 방식" id="tabs"></nav>
+    <button class="pill-toggle" id="slowBtn" data-act="slow" aria-pressed="false">느리게 듣기</button>
+  </div>
+
+  <div class="chips" id="chips" aria-label="카테고리"></div>
+
+  <main id="view"></main>
+</div>
+
+<script>
+(function () {
+  var RAW = [
+    { id: 'greet', name: '인사·작별', lines: `
+What's up?|잘 지내? / 뭐 해?|친구 사이에 가볍게 건네는 인사예요. 보통 "Not much."로 답해요.
+How's it going?|요즘 어때?|가장 흔한 안부 인사 중 하나예요.
+How are you doing?|잘 지내세요?|
+How's your day going?|오늘 하루 어때요?|
+Long time no see!|오랜만이야!|
+Good to see you.|만나서 반가워. / 보니까 좋네.|
+Nice to meet you.|처음 뵙겠습니다.|처음 만났을 때 쓰고, 헤어질 때는 "Nice meeting you."라고 해요.
+How have you been?|그동안 어떻게 지냈어?|
+Not much. You?|별거 없어. 너는?|"What's up?"에 대한 전형적인 대답이에요.
+I'm good, thanks.|잘 지내, 고마워.|
+Can't complain.|그럭저럭 괜찮아.|
+Same old, same old.|맨날 똑같지 뭐.|
+Hang in there.|힘내. 조금만 버텨.|
+Take care!|잘 지내! 몸 조심해!|
+See you later!|나중에 봐!|
+See you tomorrow.|내일 봐.|
+Have a good one!|좋은 하루 보내!|하루 중 언제든, 헤어질 때 가볍게 쓸 수 있어요.
+Have a great weekend!|좋은 주말 보내!|
+Talk to you later.|나중에 얘기하자.|
+Catch you later!|이따 보자!|
+It was nice talking to you.|이야기 즐거웠어요.|
+Say hi to your family for me.|가족분들께 안부 전해줘.|
+Good morning!|좋은 아침!|
+Good night.|잘 자. / 안녕히 주무세요.|헤어질 때가 아니라 잠자기 전에 쓰는 인사예요.
+Make yourself at home.|편하게 계세요.|` },
+    { id: 'small', name: '스몰토크', lines: `
+Where are you from?|어디 출신이세요?|
+What do you do?|무슨 일 하세요?|직업을 묻는 가장 일반적인 표현이에요.
+What do you do for fun?|취미가 뭐예요?|
+How was your weekend?|주말 어떻게 보냈어?|월요일 아침 단골 질문이에요.
+Any plans for the weekend?|주말에 계획 있어?|
+Did you do anything fun?|재밌는 거 했어?|
+Nice weather today, huh?|오늘 날씨 좋네요, 그렇죠?|날씨 이야기는 미국에서 대화를 여는 대표적인 방법이에요.
+It's freezing out there.|밖에 엄청 추워.|
+It's so hot today.|오늘 진짜 덥다.|
+Looks like it's going to rain.|비 올 것 같아.|
+I'm new around here.|저 여기 처음이에요.|
+How long have you lived here?|여기 얼마나 사셨어요?|
+Do you have any kids?|자녀 있으세요?|
+What kind of music do you like?|어떤 음악 좋아해?|
+Have you seen any good movies lately?|요즘 괜찮은 영화 봤어?|
+What are you up to?|뭐 하고 있어?|
+I'm just hanging out.|그냥 시간 보내고 있어.|
+I'm into hiking these days.|요즘 등산에 빠졌어.|"be into ~"는 ~에 푹 빠져 있다는 뜻이에요.
+I'm a big fan of jazz.|나 재즈 엄청 좋아해.|
+That's a cool jacket.|재킷 멋지다.|칭찬으로 대화를 시작하기 좋아요.
+Do you come here often?|여기 자주 오세요?|
+Small world!|세상 참 좁네!|
+What brings you here?|여긴 어쩐 일이세요?|
+I don't think we've met.|우리 아직 인사 안 한 것 같아요.|
+Let me introduce myself.|제 소개를 할게요.|` },
+    { id: 'thanks', name: '감사·사과·부탁', lines: `
+Thanks a lot!|정말 고마워요!|
+I really appreciate it.|정말 감사해요.|
+Thanks for having me.|초대해줘서 고마워요.|
+I owe you one.|내가 신세 졌네.|
+You're welcome.|천만에요.|
+No problem.|별거 아니에요.|
+Don't mention it.|별말씀을요.|
+My pleasure.|제가 기쁜걸요. (천만에요)|
+Sorry about that.|그건 미안해요.|
+I'm so sorry.|정말 죄송해요.|
+My bad.|내 잘못이야.|친구 사이에 쓰는 캐주얼한 사과예요.
+Excuse me.|실례합니다. / 저기요.|
+Pardon me?|뭐라고 하셨죠?|
+Sorry to bother you.|귀찮게 해서 죄송해요.|
+No worries.|걱정 마. 괜찮아.|
+It's no big deal.|별일 아니야.|
+Could you do me a favor?|부탁 하나 해도 될까요?|
+Can you give me a hand?|좀 도와줄래요?|
+Would you mind opening the window?|창문 좀 열어주실 수 있을까요?|"Would you mind -ing?"는 정중한 부탁이에요. 승낙은 "Not at all."
+Could you say that again?|다시 말씀해 주시겠어요?|
+Could you speak more slowly?|좀 천천히 말씀해 주시겠어요?|
+After you.|먼저 하세요.|
+Go ahead.|어서 하세요.|
+Thanks for waiting.|기다려줘서 고마워요.|
+Sorry I'm late.|늦어서 미안해요.|` },
+    { id: 'react', name: '맞장구·반응', lines: `
+Really?|정말?|
+No way!|말도 안 돼! 헐!|
+Seriously?|진짜로?|
+That's awesome!|대박이다!|
+That's great news!|좋은 소식이네!|
+Wow, that's crazy.|와, 미쳤다.|
+I can't believe it.|믿을 수가 없어.|
+You're kidding!|농담이지!|
+Oh, I see.|아, 그렇구나.|
+Got it.|알겠어요.|
+Makes sense.|말 되네. 이해돼.|
+Fair enough.|그럴 만하네. 인정.|
+That's too bad.|안됐네요.|
+I'm sorry to hear that.|그 얘기 들으니 마음이 안 좋네요.|
+Good for you!|잘됐다! 잘했어!|
+Lucky you!|좋겠다!|
+Tell me about it.|내 말이. (완전 공감)|말 그대로 "얘기해 봐"가 아니라 "나도 그래"라는 뜻이에요.
+You said it.|맞는 말이야.|
+Sounds good.|좋아요.|
+Sounds like a plan.|그렇게 하자.|
+I'm all ears.|잘 듣고 있어. 말해봐.|
+Go on.|계속 말해봐.|
+What happened?|무슨 일이야?|
+And then what?|그래서 어떻게 됐어?|
+Good point.|좋은 지적이야.|` },
+    { id: 'opinion', name: '의견·동의', lines: `
+I think so too.|나도 그렇게 생각해.|
+I couldn't agree more.|완전 동의해.|
+Exactly!|바로 그거야!|
+That's true.|맞아.|
+I see your point.|무슨 말인지 알겠어.|
+I'm not so sure.|글쎄, 잘 모르겠어.|
+I don't think so.|그렇게 생각하지 않아.|
+I disagree.|난 반대야.|
+That's not what I meant.|내 말은 그게 아니야.|
+In my opinion, it's too risky.|내 생각엔 너무 위험해.|
+If you ask me, we should wait.|내 생각을 묻는다면, 기다려야 해.|
+It depends.|상황에 따라 달라.|
+It's up to you.|네가 정해.|
+I don't mind.|난 상관없어.|
+Either is fine with me.|나는 둘 다 괜찮아.|
+I'm on the fence.|아직 결정 못 했어. 반반이야.|
+I'm torn.|마음이 갈려.|
+Let me think about it.|생각해 볼게.|
+I'll sleep on it.|하룻밤 자고 생각해볼게.|
+What do you think?|어떻게 생각해?|
+How about you?|너는 어때?|
+Why not?|안 될 거 뭐 있어? 좋아.|
+I guess so.|그런 것 같아.|
+Not really.|별로 그렇진 않아.|
+To be honest, I didn't like it.|솔직히 말하면 별로였어.|` },
+    { id: 'food', name: '식당·카페', lines: `
+A table for two, please.|두 명 자리 부탁해요.|
+Do you have a reservation?|예약하셨나요?|
+I have a reservation under Kim.|김 이름으로 예약했어요.|
+Can I see the menu?|메뉴판 좀 볼 수 있을까요?|
+I'm still deciding.|아직 고르는 중이에요.|
+What do you recommend?|추천해 주실 게 있나요?|
+I'll have the burger.|저는 버거로 할게요.|주문할 때는 "I'll have ~"가 자연스러워요.
+Can I get a coffee, please?|커피 한 잔 주시겠어요?|
+For here or to go?|드시고 가세요, 포장하세요?|
+To go, please.|포장해 주세요.|
+Can I get a refill?|리필해 주실 수 있나요?|
+Could we get some water?|물 좀 주시겠어요?|
+Is this dish spicy?|이 요리 매운가요?|
+I'm allergic to peanuts.|땅콩 알레르기가 있어요.|
+No onions, please.|양파는 빼 주세요.|
+Can I get that on the side?|그건 따로 주실 수 있나요?|소스나 드레싱을 따로 받고 싶을 때 써요.
+How's everything?|음식은 어떠세요?|
+It's delicious!|정말 맛있어요!|
+Could I get the check, please?|계산서 부탁해요.|
+Let's split the bill.|나눠서 내자.|
+This one's on me.|이번엔 내가 낼게.|
+Keep the change.|거스름돈은 가지세요.|
+Do you take credit cards?|카드 받으세요?|
+Could you box this up?|이거 포장해 주시겠어요?|남은 음식을 싸갈 때 써요.
+I'm starving.|배고파 죽겠어.|` },
+    { id: 'shop', name: '쇼핑·계산', lines: `
+I'm just looking.|그냥 구경하는 중이에요.|
+Can I help you find something?|찾으시는 거 도와드릴까요?|
+Do you have this in a larger size?|이거 더 큰 사이즈 있나요?|
+Can I try this on?|이거 입어봐도 될까요?|
+Where's the fitting room?|탈의실이 어디예요?|
+How much is this?|이거 얼마예요?|
+That's a bit expensive.|좀 비싸네요.|
+Is there a discount?|할인되나요?|
+Is this on sale?|이거 세일 중인가요?|
+Do you have anything cheaper?|더 저렴한 건 없나요?|
+I'll take it.|이걸로 할게요.|
+It doesn't fit.|안 맞아요.|
+It's too tight.|너무 꽉 껴요.|
+It's a little loose.|조금 헐렁해요.|
+Can I pay by card?|카드로 결제해도 될까요?|
+Cash or credit?|현금이세요, 카드세요?|
+Do you need a bag?|봉투 필요하세요?|
+Can I get a receipt?|영수증 주실 수 있나요?|
+I'd like to return this.|이거 반품하고 싶어요.|
+Can I exchange this for a different size?|다른 사이즈로 교환할 수 있나요?|
+What's your return policy?|반품 규정이 어떻게 되나요?|
+Is tax included?|세금 포함인가요?|미국은 표시 가격에 세금이 빠져 있는 경우가 많아요.
+Where can I find the milk?|우유는 어디 있어요?|
+I'm looking for a gift.|선물을 찾고 있어요.|
+Is this available online?|온라인에서도 살 수 있나요?|` },
+    { id: 'way', name: '길·교통', lines: `
+Excuse me, how do I get to the station?|저기요, 역에 어떻게 가나요?|
+Is it far from here?|여기서 멀어요?|
+It's a five-minute walk.|걸어서 5분 거리예요.|
+Go straight and turn left.|직진하다가 왼쪽으로 도세요.|
+Turn right at the light.|신호등에서 우회전하세요.|
+It's on your right.|오른쪽에 있어요.|
+It's right around the corner.|바로 모퉁이 돌면 있어요.|
+You can't miss it.|쉽게 찾을 수 있어요.|
+I think I'm lost.|길을 잃은 것 같아요.|
+Can you show me on the map?|지도에서 보여주실 수 있나요?|
+Does this bus go downtown?|이 버스 시내 가나요?|
+Which line should I take?|어느 호선을 타야 하죠?|
+Where do I transfer?|어디서 갈아타요?|
+How long does it take?|얼마나 걸려요?|
+How much is the fare?|요금이 얼마예요?|
+Is this seat taken?|여기 자리 있나요?|
+I'd like to get off here.|여기서 내릴게요.|
+Could you drop me off here?|여기서 내려주실래요?|
+Please take me to this address.|이 주소로 가주세요.|
+Keep going straight.|계속 직진하세요.|
+Traffic is terrible.|차가 너무 막혀요.|
+I missed my bus.|버스를 놓쳤어요.|
+Can I get a ride?|태워줄 수 있어?|
+I'll pick you up at six.|6시에 데리러 갈게.|
+Let me know when you get there.|도착하면 알려줘.|` },
+    { id: 'work', name: '직장·학교', lines: `
+I'm swamped.|일이 너무 많아요.|
+I'm running late.|늦을 것 같아요.|
+Can we reschedule?|일정 다시 잡을 수 있을까요?|
+Let's get started.|시작하죠.|
+Let's wrap this up.|마무리합시다.|
+Let me get back to you.|확인하고 다시 연락드릴게요.|
+I'll look into it.|알아볼게요.|
+I'll keep you posted.|진행 상황 계속 알려줄게요.|
+Can you send me the file?|파일 좀 보내줄래요?|
+I'll send it over by noon.|정오까지 보내드릴게요.|
+Are you free for a quick call?|잠깐 통화 가능해요?|
+Do you have a minute?|잠깐 시간 돼요?|
+Sorry to interrupt.|말씀 중에 죄송해요.|
+Let's touch base next week.|다음 주에 다시 이야기해요.|
+That works for me.|저는 그게 좋아요.|
+I'm on it.|제가 처리할게요.|
+It's on my to-do list.|제 할 일 목록에 있어요.|
+I'll take care of it.|제가 맡아서 처리할게요.|
+We're on the same page.|우리 같은 생각이네요.|
+Let's call it a day.|오늘은 여기까지 합시다.|
+I'm taking a day off tomorrow.|내일 하루 쉬어요.|
+When is it due?|마감이 언제예요?|
+I have a class at nine.|9시에 수업이 있어요.|
+Did you finish your homework?|숙제 다 했어?|
+I need to study for a test.|시험 공부해야 해.|` },
+    { id: 'plan', name: '약속·전화', lines: `
+Are you free tonight?|오늘 밤 시간 돼?|
+Let's grab lunch.|점심 먹자.|"grab"은 가볍게 먹거나 마신다는 느낌이에요.
+Wanna grab a coffee?|커피 한잔 할래?|
+Do you want to hang out?|같이 놀래?|
+What time works for you?|몇 시가 좋아?|
+How about Friday?|금요일 어때?|
+I'm in.|나도 갈게. 좋아.|
+Count me in.|나도 끼워줘.|
+Count me out.|난 빼줘.|
+I can't make it.|못 갈 것 같아.|
+Maybe next time.|다음에 하자.|
+Let's do it another time.|다른 때 하자.|
+I'll let you know.|알려줄게.|
+I'll text you.|문자 할게.|
+Give me a call.|전화 줘.|
+I'll call you back.|다시 전화할게.|
+Hold on a second.|잠깐만요.|
+Who's calling?|누구시죠? (전화)|
+Can I speak to Mr. Smith?|스미스 씨 좀 바꿔주시겠어요?|
+He's not here right now.|지금 안 계세요.|
+Can I leave a message?|메시지 남길 수 있을까요?|
+You're breaking up.|목소리가 끊겨요.|
+I'll be there in ten minutes.|10분 후에 도착해.|
+I'm on my way.|가는 중이야.|
+Are we still on for tomorrow?|내일 약속 그대로 맞지?|` },
+    { id: 'feel', name: '감정·건강', lines: `
+I'm so tired.|너무 피곤해.|
+I'm exhausted.|완전 지쳤어.|
+I'm stressed out.|스트레스 받아.|
+I'm so excited!|너무 신나!|
+I'm nervous.|긴장돼.|
+I'm so bored.|너무 지루해.|
+I'm really happy for you.|정말 잘됐다, 기뻐.|
+I'm kind of upset.|좀 속상해.|
+I feel great.|기분 최고야.|
+I'm not feeling well.|몸이 안 좋아.|
+I have a headache.|머리가 아파요.|
+I think I'm coming down with a cold.|감기 걸리려나 봐요.|
+I have a sore throat.|목이 아파요.|
+I've got a fever.|열이 나요.|
+Get well soon!|빨리 나으세요!|
+Are you okay?|괜찮아?|
+What's wrong?|무슨 일이야?|
+You look tired.|피곤해 보여.|
+Cheer up!|힘내!|
+Don't worry about it.|걱정하지 마.|
+Calm down.|진정해.|
+Take it easy.|무리하지 마. 편하게 해.|
+I can't take it anymore.|더는 못 참겠어.|
+I'm over it.|이제 괜찮아. 극복했어.|
+It's been a rough day.|힘든 하루였어.|` },
+    { id: 'travel', name: '여행·호텔', lines: `
+I'd like to check in.|체크인하고 싶어요.|
+I have a reservation under Lee.|이 이름으로 예약했어요.|
+Is breakfast included?|조식 포함인가요?|
+What time is check-out?|체크아웃은 몇 시예요?|
+Could I get a late checkout?|늦은 체크아웃 가능할까요?|
+The Wi-Fi isn't working.|와이파이가 안 돼요.|
+Could I get extra towels?|수건 더 받을 수 있나요?|
+Where's the baggage claim?|수하물 찾는 곳이 어디예요?|
+Where's gate 12?|12번 게이트가 어디예요?|
+Window or aisle seat?|창가석이세요, 통로석이세요?|
+What's the purpose of your visit?|방문 목적이 무엇인가요?|입국 심사에서 자주 듣는 질문이에요.
+I'm here on vacation.|휴가차 왔어요.|
+How long are you staying?|얼마나 머무르시나요?|
+Anything to declare?|신고할 물품 있으세요?|
+My flight was delayed.|비행기가 지연됐어요.|
+I lost my luggage.|짐을 잃어버렸어요.|
+I lost my wallet.|지갑을 잃어버렸어요.|
+Can you take a picture of us?|저희 사진 좀 찍어주실래요?|
+Is there a tourist information center nearby?|근처에 관광 안내소가 있나요?|
+What's the best way to get downtown?|시내에 가는 가장 좋은 방법이 뭐예요?|
+Do you speak English?|영어 하세요?|
+I don't speak English very well.|영어를 잘 못해요.|
+What does this mean?|이게 무슨 뜻이에요?|
+Could you write it down?|적어주실 수 있나요?|
+I'd like to exchange some money.|환전하고 싶어요.|` }
+  ];
+
+  var ITEMS = [];
+  RAW.forEach(function (c) {
+    c.lines.trim().split('\n').forEach(function (line) {
+      var p = line.split('|');
+      ITEMS.push({ id: ITEMS.length + 1, cat: c.id, en: p[0].trim(), ko: p[1].trim(), tip: (p[2] || '').trim() });
+    });
+  });
+  var TOTAL = ITEMS.length;
+
+  /* ---------- persistence ---------- */
+  var KEY = 'dailytalk300.v1';
+  var known = new Set();
+  var prefs = { slow: false };
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var o = JSON.parse(raw);
+      known = new Set(o.known || []);
+      prefs = Object.assign(prefs, o.prefs || {});
+    }
+  } catch (e) {}
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify({ known: Array.from(known), prefs: prefs })); } catch (e) {}
+  }
+
+  /* ---------- speech ---------- */
+  var canSpeak = ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window);
+  function speak(text) {
+    if (!canSpeak) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.rate = prefs.slow ? 0.7 : 0.95;
+      var voices = window.speechSynthesis.getVoices();
+      for (var i = 0; i < voices.length; i++) { if (voices[i].lang === 'en-US') { u.voice = voices[i]; break; } }
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  /* ---------- helpers ---------- */
+  var state = { mode: 'card', cat: 'all', dir: 'ko2en', revealed: false, queue: [], quiz: null, quizType: 'read', q: '', status: 'all', confirmReset: false };
+  var view = document.getElementById('view');
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function byId(id) { return ITEMS[id - 1]; }
+  function pool() { return ITEMS.filter(function (it) { return state.cat === 'all' || it.cat === state.cat; }); }
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  var ICON_SPEAK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var ICON_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+  function speakBtn(id, label) {
+    if (!canSpeak) return '';
+    return '<button class="icon-btn" data-act="speak" data-id="' + id + '" aria-label="' + (label || '발음 듣기') + '">' + ICON_SPEAK + '</button>';
+  }
+
+  function buildQueue() {
+    state.queue = shuffle(pool().filter(function (it) { return !known.has(it.id); }).map(function (it) { return it.id; }));
+    state.revealed = false;
+  }
+
+  /* ---------- header / chips / tabs ---------- */
+  function paintHeader() {
+    document.getElementById('knownCount').textContent = known.size;
+    document.getElementById('barFill').style.width = (known.size / TOTAL * 100) + '%';
+    var counts = {}; RAW.forEach(function (c) { counts[c.id] = { k: 0, t: 0 }; });
+    ITEMS.forEach(function (it) { counts[it.cat].t++; if (known.has(it.id)) counts[it.cat].k++; });
+    var html = '<button class="chip" data-act="cat" data-v="all" aria-pressed="' + (state.cat === 'all') + '">전체<small>' + known.size + '/' + TOTAL + '</small></button>';
+    RAW.forEach(function (c) {
+      html += '<button class="chip" data-act="cat" data-v="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' + esc(c.name) + '<small>' + counts[c.id].k + '/' + counts[c.id].t + '</small></button>';
+    });
+    document.getElementById('chips').innerHTML = html;
+  }
+  function paintTabs() {
+    var tabs = [['card', '카드 학습'], ['quiz', '퀴즈'], ['list', '전체 목록']];
+    document.getElementById('tabs').innerHTML = tabs.map(function (t) {
+      return '<button class="tab" role="tab" data-act="mode" data-v="' + t[0] + '" aria-selected="' + (state.mode === t[0]) + '">' + t[1] + '</button>';
+    }).join('');
+    var slow = document.getElementById('slowBtn');
+    slow.setAttribute('aria-pressed', String(!!prefs.slow));
+    slow.hidden = !canSpeak;
+  }
+
+  /* ---------- card mode ---------- */
+  function renderCard() {
+    if (!state.queue.length) {
+      view.innerHTML = '<section class="card center-card"><h2>이 묶음은 모두 외웠어요</h2><p>' + pool().length + '개 표현을 전부 익혔어요. 퀴즈로 한 번 더 확인하거나, 처음부터 다시 볼 수 있어요.</p>' +
+        '<div class="row"><button class="btn primary" data-act="mode" data-v="quiz">퀴즈 풀기</button><button class="btn" data-act="restudy">처음부터 다시 보기</button></div></section>';
+      return;
+    }
+    var it = byId(state.queue[0]);
+    var en2ko = state.dir === 'en2ko';
+    var front, back;
+    if (en2ko) {
+      front = '<div class="front"><div><p class="label">영어 표현</p><p class="phrase">' + esc(it.en) + '</p></div>' + speakBtn(it.id) + '</div>';
+      back = '<div><p class="label">뜻</p><p class="ko-big">' + esc(it.ko) + '</p>' + (it.tip ? '<p class="tip">' + esc(it.tip) + '</p>' : '') + '</div>';
+    } else {
+      front = '<div class="front"><div><p class="label">영어로 뭐라고 할까요?</p><p class="ko-big">' + esc(it.ko) + '</p></div></div>';
+      back = '<div><p class="label">영어 표현</p><p class="phrase">' + esc(it.en) + '</p>' + (it.tip ? '<p class="tip">' + esc(it.tip) + '</p>' : '') + '</div>' + speakBtn(it.id);
+    }
+    var html = '<div class="deck-meta"><span>' + state.queue.length + '개 남음</span>' +
+      '<div class="dir" role="group" aria-label="출제 방향"><button data-act="dir" data-v="ko2en" aria-pressed="' + !en2ko + '">한국어 → 영어</button><button data-act="dir" data-v="en2ko" aria-pressed="' + en2ko + '">영어 → 한국어</button></div></div>' +
+      '<article class="card">' + front +
+      (state.revealed ? '<div class="bubble">' + back + '</div>' : '<button class="btn reveal" data-act="reveal">정답 보기</button>') +
+      '</article>';
+    if (state.revealed) {
+      html += '<div class="grade"><button class="btn again" data-act="again">다시 볼래요<kbd>1</kbd></button><button class="btn primary" data-act="got">외웠어요<kbd>2</kbd></button></div>';
+    }
+    if (!canSpeak) html += '<p class="note">이 환경에서는 음성 재생을 지원하지 않아요. 소리 없이 학습할 수 있어요.</p>';
+    view.innerHTML = html;
+  }
+
+  /* ---------- quiz mode ---------- */
+  function startQuiz() {
+    var picks = shuffle(pool()).slice(0, 10);
+    state.quiz = {
+      type: state.quizType, i: 0, score: 0, wrong: [], done: false,
+      qs: picks.map(function (it) {
+        var others = shuffle(ITEMS.filter(function (x) { return x.cat === it.cat && x.id !== it.id; })).slice(0, 3).map(function (x) { return x.id; });
+        return { id: it.id, opts: shuffle([it.id].concat(others)), picked: null };
+      })
+    };
+  }
+  function speakQuestion() {
+    var z = state.quiz;
+    if (state.mode === 'quiz' && z && !z.done && z.type === 'listen' && z.qs[z.i].picked === null) speak(byId(z.qs[z.i].id).en);
+  }
+  function renderQuiz() {
+    var z = state.quiz;
+    if (!z) {
+      view.innerHTML = '<section class="card center-card"><h2>10문제 퀴즈</h2><p>선택한 묶음에서 10문제를 내요. 틀린 표현은 카드 학습에 다시 나와요.</p>' +
+        '<div class="seg" role="group" aria-label="퀴즈 유형"><button data-act="qtype" data-v="read" aria-pressed="' + (state.quizType === 'read') + '">뜻 보고 영어 고르기</button>' +
+        '<button data-act="qtype" data-v="listen" aria-pressed="' + (state.quizType === 'listen') + '"' + (canSpeak ? '' : ' disabled') + '>듣고 뜻 고르기</button></div>' +
+        (canSpeak ? '' : '<p class="note">듣기 퀴즈는 음성 재생이 되는 환경에서만 쓸 수 있어요.</p>') +
+        '<div class="row"><button class="btn primary" data-act="qstart">퀴즈 시작</button></div></section>';
+      return;
+    }
+    if (z.done) {
+      var n = z.qs.length;
+      var html = '<section class="card center-card"><p class="label">결과</p><p class="score">' + z.score + '<small> / ' + n + '</small></p>';
+      html += z.wrong.length ? '<p>틀린 표현은 외운 목록에서 빠졌어요. 카드 학습에서 다시 만나요.</p><ul class="wrong-list">' +
+        z.wrong.map(function (id) { var it = byId(id); return '<li><b>' + esc(it.en) + '</b>' + esc(it.ko) + '</li>'; }).join('') + '</ul>' : '<p>전부 맞혔어요.</p>';
+      html += '<div class="row"><button class="btn primary" data-act="qstart">새 퀴즈</button><button class="btn" data-act="mode" data-v="card">카드로 복습</button></div></section>';
+      view.innerHTML = html;
+      return;
+    }
+    var q = z.qs[z.i], it = byId(q.id), n2 = z.qs.length, listen = z.type === 'listen';
+    var prompt = listen
+      ? '<div class="front"><div><p class="label">듣고 뜻을 고르세요</p><p class="ko-big">무슨 뜻일까요?</p></div>' + speakBtn(it.id, '다시 듣기') + '</div>'
+      : '<div class="front"><div><p class="label">알맞은 영어 표현은?</p><p class="ko-big">' + esc(it.ko) + '</p></div></div>';
+    var opts = q.opts.map(function (oid, idx) {
+      var o = byId(oid), cls = 'opt', dis = '';
+      if (q.picked !== null) {
+        dis = ' disabled';
+        if (oid === q.id) cls += ' ok'; else if (oid === q.picked) cls += ' bad';
+      }
+      return '<button class="' + cls + '" data-act="pick" data-v="' + oid + '"' + dis + '>' + (idx + 1) + '. ' + esc(listen ? o.ko : o.en) + '</button>';
+    }).join('');
+    var html2 = '<div class="qhead"><span>' + (z.i + 1) + ' / ' + n2 + '</span><span>맞은 개수 ' + z.score + '</span></div>' +
+      '<div class="bar"><i style="width:' + (z.i / n2 * 100) + '%"></i></div>' +
+      '<article class="card">' + prompt + '</article><div class="opts">' + opts + '</div>';
+    if (q.picked !== null) {
+      html2 += '<div class="feedback"><p>' + (q.picked === q.id ? '정답이에요. ' : '아쉬워요. ') + '<b>' + esc(it.en) + '</b> ' + esc(it.ko) + '</p>' + speakBtn(it.id) + '</div>' +
+        '<div class="row"><button class="btn primary" data-act="next">' + (z.i < n2 - 1 ? '다음 문제' : '결과 보기') + '</button></div>';
+    }
+    view.innerHTML = html2;
+  }
+
+  /* ---------- list mode ---------- */
+  function renderList() {
+    var segs = [['all', '전체'], ['todo', '아직 못 외움'], ['done', '외움']];
+    view.innerHTML = '<div class="tools"><input id="q" type="search" placeholder="표현이나 뜻으로 검색" value="' + esc(state.q) + '" aria-label="검색">' +
+      '<div class="seg" role="group" aria-label="상태 필터">' + segs.map(function (s) {
+        return '<button data-act="status" data-v="' + s[0] + '" aria-pressed="' + (state.status === s[0]) + '">' + s[1] + '</button>';
+      }).join('') + '</div></div><p class="list-count" id="listCount"></p><ul class="rows" id="rows"></ul>' +
+      '<div class="reset">' + (state.confirmReset
+        ? '<span>모든 진도를 지울까요?</span><button class="btn again" data-act="resetDo">지우기</button><button class="btn" data-act="resetNo">취소</button>'
+        : '<button class="btn" data-act="resetAsk">진도 초기화</button>') + '</div>';
+    paintRows();
+  }
+  function paintRows() {
+    var q = state.q.trim().toLowerCase();
+    var list = pool().filter(function (it) {
+      if (state.status === 'todo' && known.has(it.id)) return false;
+      if (state.status === 'done' && !known.has(it.id)) return false;
+      if (q && it.en.toLowerCase().indexOf(q) < 0 && it.ko.indexOf(q) < 0) return false;
+      return true;
+    });
+    document.getElementById('listCount').textContent = list.length + '개 표현';
+    document.getElementById('rows').innerHTML = list.length ? list.map(function (it) {
+      var k = known.has(it.id);
+      return '<li class="item' + (k ? ' is-known' : '') + '"><button class="check" data-act="toggle" data-id="' + it.id + '" aria-pressed="' + k + '" aria-label="외움 표시">' + ICON_CHECK + '</button>' +
+        '<div class="txt"><p class="en">' + esc(it.en) + '</p><p class="ko">' + esc(it.ko) + '</p></div>' + speakBtn(it.id) + '</li>';
+    }).join('') : '<li class="note">조건에 맞는 표현이 없어요.</li>';
+  }
+
+  /* ---------- render + actions ---------- */
+  function render() {
+    paintTabs();
+    paintHeader();
+    if (state.mode === 'card') renderCard();
+    else if (state.mode === 'quiz') renderQuiz();
+    else renderList();
+  }
+
+  function act(name, v, id) {
+    var z = state.quiz;
+    switch (name) {
+      case 'mode': state.mode = v; state.confirmReset = false; if (v === 'card') buildQueue(); if (v === 'quiz') state.quiz = null; render(); break;
+      case 'cat': state.cat = v; buildQueue(); state.quiz = null; render(); break;
+      case 'dir': state.dir = v; state.revealed = false; render(); break;
+      case 'reveal': state.revealed = true; render(); if (state.dir === 'ko2en') speak(byId(state.queue[0]).en); break;
+      case 'again': state.queue.push(state.queue.shift()); state.revealed = false; render(); break;
+      case 'got': known.add(state.queue.shift()); save(); state.revealed = false; render(); break;
+      case 'speak': speak(byId(+id).en); break;
+      case 'slow': prefs.slow = !prefs.slow; save(); paintTabs(); break;
+      case 'restudy': pool().forEach(function (it) { known.delete(it.id); }); save(); buildQueue(); render(); break;
+      case 'qtype': state.quizType = v; render(); break;
+      case 'qstart': startQuiz(); render(); speakQuestion(); break;
+      case 'pick':
+        if (!z || z.done) break;
+        var q = z.qs[z.i];
+        if (q.picked !== null) break;
+        q.picked = +v;
+        if (q.picked === q.id) z.score++;
+        else { z.wrong.push(q.id); known.delete(q.id); save(); }
+        render();
+        break;
+      case 'next':
+        if (!z) break;
+        if (z.i < z.qs.length - 1) { z.i++; } else { z.done = true; }
+        render(); speakQuestion();
+        break;
+      case 'status': state.status = v; renderList(); break;
+      case 'toggle':
+        id = +id;
+        if (known.has(id)) known.delete(id); else known.add(id);
+        save(); paintHeader(); paintRows();
+        break;
+      case 'resetAsk': state.confirmReset = true; renderList(); break;
+      case 'resetNo': state.confirmReset = false; renderList(); break;
+      case 'resetDo': known.clear(); save(); state.confirmReset = false; buildQueue(); render(); break;
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]');
+    if (!b || b.disabled) return;
+    act(b.dataset.act, b.dataset.v, b.dataset.id);
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'q') { state.q = e.target.value; paintRows(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.target !== document.body || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (state.mode === 'card' && state.queue.length) {
+      if (!state.revealed && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); act('reveal'); }
+      else if (state.revealed && e.key === '1') act('again');
+      else if (state.revealed && e.key === '2') act('got');
+    } else if (state.mode === 'quiz' && state.quiz && !state.quiz.done) {
+      var q = state.quiz.qs[state.quiz.i], n = parseInt(e.key, 10);
+      if (q.picked === null && n >= 1 && n <= q.opts.length) act('pick', q.opts[n - 1]);
+      else if (q.picked !== null && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); act('next'); }
+    }
+  });
+  if (canSpeak) { try { window.speechSynthesis.getVoices(); } catch (e) {} }
+
+  buildQueue();
+  render();
+})();
+</script>
+
+</body></html>
