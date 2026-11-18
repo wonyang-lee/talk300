@@ -67,11 +67,17 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .pill-toggle { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 8px 14px; font-size: 14px; min-height: 40px; }
 .pill-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 
-.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
-.chip { flex: 0 0 auto; white-space: nowrap; border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 6px 14px; font-size: 14px; min-height: 36px; }
-.chip small { color: var(--muted); margin-left: 6px; font-variant-numeric: tabular-nums; }
-.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-.chip[aria-pressed="true"] small { color: inherit; opacity: .75; }
+.topic { display: flex; align-items: center; gap: 12px; }
+.topic label { flex: 0 0 auto; font-size: 13px; font-weight: 700; color: var(--muted); }
+.topic select {
+  flex: 1; min-width: 0; min-height: 48px; padding: 10px 40px 10px 14px; border-radius: 12px;
+  border: 1px solid var(--line); background-color: var(--surface); color: var(--fg);
+  font: inherit; font-weight: 500; text-overflow: ellipsis;
+  -webkit-appearance: none; appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 21px) calc(50% - 2px), calc(100% - 15px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
+}
 
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 26px 24px; display: flex; flex-direction: column; gap: 18px; }
 .label { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
@@ -146,13 +152,6 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
   .tabs { width: 100%; }
   .tab { flex: 1; padding: 8px 4px; text-align: center; min-height: 44px; }
   .pill-toggle { align-self: flex-end; }
-  /* category chips scroll edge to edge */
-  .chips {
-    margin-left: calc(max(16px, env(safe-area-inset-left, 0px)) * -1);
-    margin-right: calc(max(16px, env(safe-area-inset-right, 0px)) * -1);
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-  }
   .deck-meta { flex-direction: column; align-items: stretch; gap: 10px; }
   .dir { width: 100%; }
   .dir button { flex: 1; min-height: 40px; }
@@ -198,7 +197,10 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
     <button class="pill-toggle" id="slowBtn" data-act="slow" aria-pressed="false">느리게 듣기</button>
   </div>
 
-  <div class="chips" id="chips" aria-label="카테고리"></div>
+  <div class="topic">
+    <label for="topicSel">주제</label>
+    <select id="topicSel"></select>
+  </div>
 
   <main id="view"></main>
 </div>
@@ -589,11 +591,11 @@ I'd like to exchange some money.|환전하고 싶어요.|` }
     document.getElementById('barFill').style.width = (known.size / TOTAL * 100) + '%';
     var counts = {}; RAW.forEach(function (c) { counts[c.id] = { k: 0, t: 0 }; });
     ITEMS.forEach(function (it) { counts[it.cat].t++; if (known.has(it.id)) counts[it.cat].k++; });
-    var html = '<button class="chip" data-act="cat" data-v="all" aria-pressed="' + (state.cat === 'all') + '">전체<small>' + known.size + '/' + TOTAL + '</small></button>';
+    var opts = '<option value="all"' + (state.cat === 'all' ? ' selected' : '') + '>전체 주제 · ' + known.size + '/' + TOTAL + '</option>';
     RAW.forEach(function (c) {
-      html += '<button class="chip" data-act="cat" data-v="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' + esc(c.name) + '<small>' + counts[c.id].k + '/' + counts[c.id].t + '</small></button>';
+      opts += '<option value="' + c.id + '"' + (state.cat === c.id ? ' selected' : '') + '>' + esc(c.name) + ' · ' + counts[c.id].k + '/' + counts[c.id].t + '</option>';
     });
-    document.getElementById('chips').innerHTML = html;
+    document.getElementById('topicSel').innerHTML = opts;
   }
   function paintTabs() {
     var tabs = [['card', '카드 학습'], ['quiz', '퀴즈'], ['list', '전체 목록']];
@@ -771,6 +773,9 @@ I'd like to exchange some money.|환전하고 싶어요.|` }
     var b = e.target.closest('[data-act]');
     if (!b || b.disabled) return;
     act(b.dataset.act, b.dataset.v, b.dataset.id);
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'topicSel') act('cat', e.target.value);
   });
   document.addEventListener('input', function (e) {
     if (e.target && e.target.id === 'q') { state.q = e.target.value; paintRows(); }
